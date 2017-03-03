@@ -52,7 +52,20 @@ namespace MonchoFactory.Mulo.WebApi.Controllers
                 return BadRequest();
             }
 
-            db.Entry(musician).State = EntityState.Modified;
+            musician.Genres = musician.Genres.Select(genre => db.Genres.Find(genre.Id)).ToList();
+            musician.Instruments = musician.Instruments.Select(instrument => db.Instruments.Find(instrument.Id)).ToList();
+
+            var original = db.Musicians.Include("Genres").Include("Instruments").Single(x => x.Id == musician.Id);
+
+            original.Genres = musician.Genres;
+            original.Instruments = musician.Instruments;
+            original.Email = musician.Email;
+            original.FirstName = musician.FirstName;
+            original.LastName = musician.LastName;
+            original.LocationGooglePlaceId = musician.LocationGooglePlaceId;
+            original.LocationLatitude = musician.LocationLatitude;
+            original.LocationLongitude = musician.LocationLongitude;
+            original.LocationName = musician.LocationName;
 
             try
             {

@@ -13,5 +13,12 @@ namespace MonchoFactory.Mulo.WebApi.Models
         public string Email { get; set; }
         public virtual ICollection<Instrument> Instruments { get; set; }
         public virtual ICollection<Genre> Genres { get; set; }
+
+        //Location Fields
+
+        public string LocationName { get; set; }
+        public string LocationGooglePlaceId { get; set; }
+        public double LocationLatitude { get; set; }
+        public double LocationLongitude { get; set; }
     }
 }

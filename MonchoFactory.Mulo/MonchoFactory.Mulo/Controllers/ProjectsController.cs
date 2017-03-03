@@ -51,7 +51,20 @@ namespace MonchoFactory.Mulo.WebApi.Controllers
                 return BadRequest();
             }
 
-            db.Entry(project).State = EntityState.Modified;
+            project.Genres = project.Genres.Select(genre => db.Genres.Find(genre.Id)).ToList();
+            project.Instruments = project.Instruments.Select(instrument => db.Instruments.Find(instrument.Id)).ToList();
+
+            var original = db.Projects.Include("Genres").Include("Instruments").Single(x => x.ProjectID == project.ProjectID);
+
+            original.Genres = project.Genres;
+            original.Instruments = project.Instruments;
+            original.Title = project.Title;
+            original.FacebookUrl = project.FacebookUrl;
+            original.SoundcloudUrl = project.SoundcloudUrl;
+            original.LocationGooglePlaceId = project.LocationGooglePlaceId;
+            original.LocationLatitude = project.LocationLatitude;
+            original.LocationLongitude = project.LocationLongitude;
+            original.LocationName = project.LocationName;
 
             try
             {
@@ -80,6 +93,10 @@ namespace MonchoFactory.Mulo.WebApi.Controllers
             {
                 return BadRequest(ModelState);
             }
+
+            project.Genres = project.Genres.Select(genre => db.Genres.Find(genre.Id)).ToList();
+
+            project.Instruments = project.Instruments.Select(instrument => db.Instruments.Find(instrument.Id)).ToList();
 
             db.Projects.Add(project);
             await db.SaveChangesAsync();
