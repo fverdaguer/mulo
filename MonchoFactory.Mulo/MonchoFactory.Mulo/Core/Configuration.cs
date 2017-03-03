@@ -15,8 +15,8 @@ namespace MonchoFactory.Mulo.WebApi.Core
             AutomaticMigrationsEnabled = true;
             AutomaticMigrationDataLossAllowed = false;
         }
-
-        [Obsolete]
+        
+        /*
         protected override void Seed(MuloContext context)
         {
             context.Instruments.AddOrUpdate(new Instrument {Id = 1, Name = "Guitar"});
@@ -106,6 +106,6 @@ namespace MonchoFactory.Mulo.WebApi.Core
             }
 
             context.SaveChanges();
-        }
+        }*/
     }
 }

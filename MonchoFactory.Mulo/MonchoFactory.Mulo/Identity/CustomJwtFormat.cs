@@ -30,7 +30,7 @@ namespace MonchoFactory.Mulo.WebApi.Identity
             var issued = data.Properties.IssuedUtc;
             var expires = data.Properties.ExpiresUtc;
 
-            return new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(_issuer, null, data.Identity.Claims, issued.Value.UtcDateTime, expires.Value.UtcDateTime, signingKey));
+            return new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(_issuer, "Any", data.Identity.Claims, issued.Value.UtcDateTime, expires.Value.UtcDateTime, signingKey));
         }
 
         public AuthenticationTicket Unprotect(string protectedText)

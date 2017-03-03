@@ -14,6 +14,7 @@ using MonchoFactory.Mulo.WebApi.Models;
 
 namespace MonchoFactory.Mulo.WebApi.Controllers
 {
+    [Authorize]
     public class MusiciansController : ApiController
     {
         private MuloContext db = new MuloContext();
