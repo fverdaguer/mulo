@@ -82,6 +82,10 @@ namespace MonchoFactory.Mulo.WebApi.Controllers
                 return BadRequest(ModelState);
             }
 
+            musician.Genres = musician.Genres.Select(genre => db.Genres.Find(genre.Id)).ToList();
+
+            musician.Instruments = musician.Instruments.Select(instrument => db.Instruments.Find(instrument.Id)).ToList();
+
             db.Musicians.Add(musician);
             await db.SaveChangesAsync();
 
