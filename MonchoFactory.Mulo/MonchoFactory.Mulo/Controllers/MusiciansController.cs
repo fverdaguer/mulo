@@ -10,10 +10,12 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
 using MonchoFactory.Mulo.WebApi.Core;
+using MonchoFactory.Mulo.WebApi.Helpers;
 using MonchoFactory.Mulo.WebApi.Models;
 
 namespace MonchoFactory.Mulo.WebApi.Controllers
 {
+    [RoutePrefix("api/musicians")]
     [Authorize]
     public class MusiciansController : ApiController
     {
@@ -23,6 +25,25 @@ namespace MonchoFactory.Mulo.WebApi.Controllers
         public async Task<IHttpActionResult> GetMusicians()
         {
             return Ok(await db.Musicians.ToListAsync());
+        }
+
+        [HttpGet]
+        [Route("{instruments}/{genres}/{latitude}/{longitude}")]
+        // GET: api/Musicians/instruments/genres/locationLatitude/locationLongitude
+        public async Task<IHttpActionResult> GetMusicians(string instruments, string genres, string latitude, string longitude)
+        {
+            var instrumentIds = instruments.Split(',').Select(int.Parse).ToList();
+            var genreIds = genres.Split(',').Select(int.Parse).ToList();
+
+            var musicians = await db.Musicians.ToListAsync();
+
+            var result = musicians.Where(musician => musician.Instruments.Any(x => instrumentIds.Any(y => y == x.Id))).ToList();
+            result = result.Where(musician => musician.Genres.Any(x => genreIds.Any(y => y == x.Id))).ToList();
+            
+            return Ok(result.OrderBy(
+                x =>
+                    LocationHelper.GetDistanceKM(x.LocationLatitude, x.LocationLongitude, Convert.ToDouble(latitude),
+                        Convert.ToDouble(longitude))));
         }
 
         // GET: api/Musicians/5

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
 using MonchoFactory.Mulo.WebApi.Core;
+using MonchoFactory.Mulo.WebApi.Helpers;
 using MonchoFactory.Mulo.WebApi.Models;
 
 namespace MonchoFactory.Mulo.WebApi.Controllers
@@ -22,6 +23,25 @@ namespace MonchoFactory.Mulo.WebApi.Controllers
         public async Task<IHttpActionResult> GetProjects()
         {
             return Ok(await db.Projects.ToListAsync());
+        }
+
+        [HttpGet]
+        [Route("{instruments}/{genres}/{latitude}/{longitude}")]
+        // GET: api/Musicians/instruments/genres/locationLatitude/locationLongitude
+        public async Task<IHttpActionResult> GetProjects(string instruments, string genres, string latitude, string longitude)
+        {
+            var instrumentIds = instruments.Split(',').Select(int.Parse).ToList();
+            var genreIds = genres.Split(',').Select(int.Parse).ToList();
+
+            var projects = await db.Projects.ToListAsync();
+
+            var result = projects.Where(project => project.Instruments.Any(x => instrumentIds.Any(y => y == x.Id))).ToList();
+            result = result.Where(project => project.Genres.Any(x => genreIds.Any(y => y == x.Id))).ToList();
+
+            return Ok(result.OrderBy(
+                x =>
+                    LocationHelper.GetDistanceKM(x.LocationLatitude, x.LocationLongitude, Convert.ToDouble(latitude),
+                        Convert.ToDouble(longitude))));
         }
 
         // GET: api/Projects/5

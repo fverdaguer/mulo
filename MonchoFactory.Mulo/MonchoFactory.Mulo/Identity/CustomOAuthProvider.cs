@@ -10,6 +10,7 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.OAuth;
 using MonchoFactory.Mulo.WebApi.Core;
+using Facebook;
 
 namespace MonchoFactory.Mulo.WebApi.Identity
 {
@@ -37,6 +38,31 @@ namespace MonchoFactory.Mulo.WebApi.Identity
         {
             context.Validated();
             return Task.FromResult<object>(null);
+        }
+
+        public override async Task GrantCustomExtension(OAuthGrantCustomExtensionContext context)
+        {
+            if (context.GrantType.ToLower() == "facebook")
+            {
+                var fbClient = new FacebookClient(context.Parameters.Get("accesstoken"));
+
+                dynamic response = await fbClient.GetTaskAsync("me", new { fields = "email, first_name, last_name" });
+
+                string id = response.id;
+                string email = response.email;
+                string firstname = response.first_name;
+                string lastname = response.last_name;
+                // place your own logic to lookup and/or create users....
+                context.OwinContext.GetUserManager<MuloUserManager>().Create(new IdentityUser(email));
+                // your choice of claims...
+                var identity = new ClaimsIdentity(context.Options.AuthenticationType);
+                identity.AddClaim(new Claim("sub", $"{firstname} {lastname}"));
+                identity.AddClaim(new Claim("role", id));
+
+                await base.GrantCustomExtension(context);
+                context.Validated(identity);
+
+            }
         }
 
         private static ClaimsIdentity SetClaimsIdentity(OAuthGrantResourceOwnerCredentialsContext context, IdentityUser user)
